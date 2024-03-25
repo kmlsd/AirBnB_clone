@@ -6,10 +6,10 @@ Contains the BaseModel class which will be the
 """
 import uuid
 from datetime import datetime
-import models
 
 
-class BaseModel():
+
+class BaseModel:
     """This class will be the “base” of all other classes in this project.
 
     The goal is to manage all common attributes and methods for other classes.
@@ -27,16 +27,20 @@ class BaseModel():
             *args: unused.
             **kwargs (dict): a dictionary containing wanted attributes.
         """
-        self.id = str(uuid.uuid4())
-        self.created_at = self.updated_at = datetime.now()
+	 """initialize  if nothing is passed"""
+   
+	        self.id = str(uuid.uuid4())
+        	self.created_at = self.updated_at = datetime.now()
         if kwargs is not None and kwargs != {}:
             for k, v in kwargs.items():
                 if k in ["created_at", "updated_at"]:
                     v = datetime.strptime(v, "%Y-%m-%dT%H:%M:%S.%f")
                 if k != "__class__":
                     setattr(self, k, v)
-        else:
+	 else:
             models.storage.new(self)
+
+
 
     def __str__(self):
         """Overrides the default behaviour of the __str__ method."""
@@ -46,7 +50,8 @@ class BaseModel():
     def save(self):
         """Updates the updated_at attribute with the current datetime."""
         self.updated_at = datetime.now()
-        models.storage.save()
+	models.storage.save()
+        
 
     def to_dict(self):
         """Returns a dictionary with all the keys/values of the instance."""
