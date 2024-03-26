@@ -28,17 +28,24 @@ class BaseModel:
             **kwargs (dict): a dictionary containing wanted attributes.
         """
 	 """initialize  if nothing is passed"""
-   
-	        self.id = str(uuid.uuid4())
-        	self.created_at = self.updated_at = datetime.now()
-        if kwargs is not None and kwargs != {}:
-            for k, v in kwargs.items():
-                if k in ["created_at", "updated_at"]:
-                    v = datetime.strptime(v, "%Y-%m-%dT%H:%M:%S.%f")
-                if k != "__class__":
-                    setattr(self, k, v)
-	 else:
-            models.storage.new(self)
+        if kwargs != {}:
+          for Key, val in kwargs.items():
+            if Key == "__class_":
+                continue
+            if "created_at" in kwargs:
+              self.created_at = datetime.strptime(
+                    kwargs['created_at'],
+                    '%Y-%m-%dT%H:%M:%S.%f')
+            if "updated_at" in kwargs:
+              self.updated_at = datetime.strptime(
+                    kwargs['updated_at'],
+                    '%Y-%m-%dT%H:%M:%S.%f')
+
+        else:
+            self.id = str(uuid.uuid4())
+            self.created_at = datetime.now()
+            self.updated_at = datetime.now()
+            
 
 
 
@@ -50,7 +57,7 @@ class BaseModel:
     def save(self):
         """Updates the updated_at attribute with the current datetime."""
         self.updated_at = datetime.now()
-	models.storage.save()
+	
         
 
     def to_dict(self):
