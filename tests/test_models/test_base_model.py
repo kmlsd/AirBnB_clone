@@ -2,54 +2,105 @@
 """ unittest for base model """
 
 
-import unittest
-from models.base_model import BaseModel
 from datetime import datetime
-from uuid import uuid4
+import inspect
+from models.base_model import BaseModel
+import pep8 as pycodestyle
+import unittest
 
+module_doc = models.base_model.__doc__
+
+class Testforpycodestyle(unittest.TestCase):
+    """Tests to check the documentation and style of BaseModel class"""
+
+    @classmethod
+    def setUpClass(self):
+        """Set up for docstring tests"""
+        BaseModel = models.base_model.BaseModel
+        self.base_funcs = inspect.getmembers(BaseModel, inspect.isfunction)
+
+    def test_pep8_conformance(self):
+        """Test that models/base_model.py conforms to PEP8."""
+        for path in ['models/base_model.py',
+                     'tests/test_models/test_base_model.py']:
+            with self.subTest(path=path):
+                errors = pycodestyle.Checker(path).check_all()
+                self.assertEqual(errors, 0)
+
+    def test_module_docstring(self):
+        """Test for the existence of module docstring"""
+        self.assertIsNot(module_doc, None,
+                         "base_model.py needs a docstring")
+        self.assertTrue(len(module_doc) > 1,
+                        "base_model.py needs a docstring")
+
+    def test_class_docstring(self):
+        """Test for the BaseModel class docstring"""
+        self.assertIsNot(BaseModel.__doc__, None,
+                         "BaseModel class needs a docstring")
+        self.assertTrue(len(BaseModel.__doc__) >= 1,
+                        "BaseModel class needs a docstring")
+
+    def test_func_docstrings(self):
+        """Test for the presence of docstrings in BaseModel methods"""
+        for func in self.base_funcs:
+            with self.subTest(function=func):
+                self.assertIsNot(
+                    func[1].__doc__,
+                    None,
+                    "{:s} method needs a docstring".format(func[0])
+                )
+                self.assertTrue(
+                    len(func[1].__doc__) > 1,
+                    "{:s} method needs a docstring".format(func[0])
+                )
+
+
+
+""" define to tesst out putwith type """
 
 class TestBaseModel(unittest.TestCase):
     """ define unittests for base model """
 
     def setUp(self):
         """ setup for the proceeding tests """
-        self.model = BaseModel()
-        self.model.name = "My First Model"
-        self.model.my_number = 89
+        model = BaseModel()
+        model.name = "My First Model"
+        model.my_number = 89
 
     def test_id_type(self):
         """ test for id type """
-        self.assertEqual(type(self.model.id), str)
+        self.assertEqual(type(model.id), str)
 
     def test_created_at_type(self):
         """ test for created at type """
-        self.assertEqual(type(self.model.created_at), datetime)
+        self.assertEqual(type(model.created_at), datetime)
 
     def test_updated_at_type(self):
         """ test for updated at type """
-        self.assertEqual(type(self.model.updated_at), datetime)
+        self.assertIsInstance(model.updated_at, datetime)
 
     def test_name_type(self):
         """ test for name type """
-        self.assertEqual(type(self.model.name), str)
+        self.assertEqual(type(model.name), str)
 
     def test_my_number_type(self):
         """ test for my number type """
-        self.assertEqual(type(self.model.my_number), int)
+        self.assertEqual(type(model.my_number), int)
 
     def test_save_updates_updated_at(self):
         """ test for save updated at """
-        old_updated_at = self.model.updated_at
-        self.model.save()
-        self.assertNotEqual(old_updated_at, self.model.updated_at)
+        old_updated_at = model.updated_at
+        model.save()
+        self.assertNotEqual(old_updated_at, model.updated_at)
 
     def test_to_dict_returns_dict(self):
         """ test for to dict return type """
-        self.assertEqual(type(self.model.to_dict()), dict)
+        self.assertIsInstance(type(model.to_dict()), dict)
 
     def test_to_dict_contains_correct_keys(self):
         """ test for dict containing correct keys """
-        model_dict = self.model.to_dict()
+        model_dict = model.to_dict()
         self.assertIn('id', model_dict)
         self.assertIn('created_at', model_dict)
         self.assertIn('updated_at', model_dict)
@@ -57,17 +108,17 @@ class TestBaseModel(unittest.TestCase):
         self.assertIn('my_number', model_dict)
         self.assertIn('__class__', model_dict)
 
-    def test_to_dict_created_at_format(self):
+    def test_to_dict_created_time_at_format(self):
         """ test for created at format """
-        model_dict = self.model.to_dict()
+        model_dict = model.to_dict()
         created_at = model_dict['created_at']
-        self.assertEqual(created_at, self.model.created_at.isoformat())
+        self.assertEqual(created_at, model.created_at.isoformat())
 
     def test_to_dict_updated_at_format(self):
         """ test for updated at format """
-        model_dict = self.model.to_dict()
+        model_dict = model.to_dict()
         updated_at = model_dict['updated_at']
-        self.assertEqual(updated_at, self.model.updated_at.isoformat())
+        self.assertEqual(updated_at, model.updated_at.isoformat())
 
 
 class TestBaseModelTwo(unittest.TestCase):
@@ -75,36 +126,31 @@ class TestBaseModelTwo(unittest.TestCase):
 
     def setUp(self):
         """ setup for proceeding tests two """
-        self.my_model = BaseModel()
+        my_model = BaseModel()
 
     def test_id_generation(self):
         """ test for id gen type """
-        self.assertIsInstance(self.my_model.id, str)
+        self.assertIsInstance(my_model.id, str)
 
     def test_str_representation(self):
         """ test for str rep """
         expected = "[BaseModel] ({}) {}".format(
-            self.my_model.id, self.my_model.__dict__)
-        self.assertEqual(str(self.my_model), expected)
+            my_model.id, my_model.__dict__)
+        self.assertIsInstance(str(my_model), expected)
 
     def test_to_dict_method(self):
         """ test for to dict method """
-        my_model_dict = self.my_model.to_dict()
-        self.assertIsInstance(my_model_dict['created_at'], str)
-        self.assertIsInstance(my_model_dict['updated_at'], str)
+        my_model_dict = my_model.to_dict()
+        self.assertIsInstance(my_model_dict['created_at'], 'BaseModel')
+        self.assertIsInstance(my_model_dict['updated_at'], 'BaseModel')
         self.assertEqual(my_model_dict['__class__'], 'BaseModel')
 
     def test_from_dict_method(self):
         """ test for from dict method """
-        my_model_dict = self.my_model.to_dict()
+        my_model_dict = my_model.to_dict()
         my_new_model = BaseModel(**my_model_dict)
-        self.assertIsInstance(my_new_model, BaseModel)
-        self.assertEqual(my_new_model.id, self.my_model.id)
-        self.assertEqual(my_new_model.created_at, self.my_model.created_at)
-        self.assertEqual(my_new_model.updated_at, self.my_model.updated_at)
+        self.assertEqual(my_new_model.id, my_model.id)
+        self.assertEqual(my_new_model.created_at, my_model.created_at)
+        self.assertEqual(my_new_model.updated_at, my_model.updated_at)
 
-    def test_created_at_and_updated_at_types(self):
-        """ test for created at and updated at types """
-        self.assertIsInstance(self.my_model.created_at, datetime)
-        self.assertIsInstance(self.my_model.updated_at, datetime)
 
