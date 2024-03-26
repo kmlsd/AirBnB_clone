@@ -7,6 +7,8 @@ import inspect
 from models.base_model import BaseModel
 import pep8 as pycodestyle
 import unittest
+from unittest import mock
+
 
 module_doc = models.base_model.__doc__
 
@@ -153,5 +155,41 @@ class TestBaseModelTwo(unittest.TestCase):
         self.assertEqual(my_new_model.created_at, my_model.created_at)
         self.assertEqual(my_new_model.updated_at, my_model.updated_at)
 
+class TestBaseMode_file_storage(unittest.TestCase):
+    """Test the BaseModel class"""
+    @mock.patch('models.storage')
+    def test_instantiation(self, mock_storage):
+        """Test that object is correctly created"""
+        inst = BaseModel()
+        self.assertIs(type(inst), BaseModel)
+        inst.name = "My_First_Model"
+        inst.number = 89
+        attrs_types = {
+            "id": str,
+            "created_at": datetime,
+            "updated_at": datetime,
+            "name": str,
+            "number": int
+        }
+        for attr, typ in attrs_types.items():
+            with self.subTest(attr=attr, typ=typ):
+                self.assertIn(attr, inst.__dict__)
+                self.assertIs(type(inst.__dict__[attr]), typ)
+        self.assertTrue(mock_storage.new.called)
+        self.assertEqual(inst.name, "My_First_Model")
+        self.assertEqual(inst.number, 89)
+     
+    def test_save(self, mock_storage):
+        """Test that save method updates `updated_at` and calls
+        `storage.save`"""
+        inst = BaseModel()
+        old_created_at = inst.created_at
+        old_updated_at = inst.updated_at
+        inst.save()
+        new_created_at = inst.created_at
+        new_updated_at = inst.updated_at
+        self.assertNotEqual(old_updated_at, new_updated_at)
+        self.assertEqual(old_created_at, new_created_at)
+        self.assertTrue(mock_storage.save.called)
 if __name__ == "__main__":
     unittest.main()

@@ -42,7 +42,7 @@ class FileStorage():
         """Deserializes the JSON file to __objects."""
         try:
             with open(FileStorage.__file_path, "r+") as fle_obj:
-                input = json.load(f)
+                input = json.load(fle_obj)
                 for k, v in input.items():
                     FileStorage.__objects[k] = eval(v["__class__"])(**v)
         except:
