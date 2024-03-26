@@ -16,7 +16,7 @@ class Testforpycodestyle(unittest.TestCase):
     @classmethod
     def setUpClass(self):
         """Set up for docstring tests"""
-        BaseModel = models.base_model.BaseModel
+        BaseModel = BaseModel()
         self.base_funcs = inspect.getmembers(BaseModel, inspect.isfunction)
 
     def test_pep8_conformance(self):
@@ -153,4 +153,5 @@ class TestBaseModelTwo(unittest.TestCase):
         self.assertEqual(my_new_model.created_at, my_model.created_at)
         self.assertEqual(my_new_model.updated_at, my_model.updated_at)
 
-
+if __name__ == "__main__":
+    unittest.main()
