@@ -2,7 +2,7 @@
 """
     This is the model init module.
 """
-from .engine.file_storage import FileStorage
+from models.engine.file_storage import FileStorage
 """
 Retrieves the storage instance
 """
